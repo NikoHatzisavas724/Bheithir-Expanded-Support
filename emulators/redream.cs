@@ -6,12 +6,12 @@ using System.Text.RegularExpressions;
 
 namespace Bheithir.Emulators
 {
-    class Citron : Presence
+    class Redream : Presence
     {
-        public Citron()
+        public Redream()
         {
-            DiscordAppId = "1360038366464311385";
-            ProcessName = "citron";
+            DiscordAppId = "1360156236661788702";
+            ProcessName = "redream";
             WindowPattern = new Regex("(\\s-\\s)(?!.*(\\s-\\s))", RegexOptions.Compiled);
         }
 
@@ -72,37 +72,24 @@ namespace Bheithir.Emulators
             }
         }
 
-        public static bool HasTwoPipes(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return false;
-
-            int firstPipe = input.IndexOf('|');
-            if (firstPipe == -1) return false;
-
-            int secondPipe = input.IndexOf('|', firstPipe + 1);
-            return secondPipe != -1;
-        }
-
         public override void SetNewPresence()
         {
-            string[] titleParts = WindowPattern.Split(WindowTitle);
             string details;
+            // Console.WriteLine(WindowTitle);
             try
             {
-                if (HasTwoPipes(titleParts[0]))
-                {
-                    details = ParsingUtils.RemoveAfter64Bit(ParsingUtils.RemoveBeforeSecondPipe(titleParts[0]));
-                }
+                if (WindowTitle.Contains("redream"))
+                    details = "";
                 else
-                    details = "No game loaded";
+                    details = ParsingUtils.RemoveBeforeDash(ParsingUtils.RemoveParenthesesAndBrackets(WindowTitle));
             }
             catch (Exception) { return; }
 
             string status;
             try
             {
-                status = ParsingUtils.RemoveAfterSecondPipe(titleParts[0]);
+                // status = RemoveBeforeDash(RemoveParenthesesAndBrackets(WindowTitle));
+                status = "";
             }
             catch (Exception) { return; }
 
@@ -115,8 +102,8 @@ namespace Bheithir.Emulators
                     Timestamps = new Timestamps(DateTime.UtcNow),
                     Assets = new Assets()
                     {
-                        LargeImageKey = "citronlogo",
-                        LargeImageText = "Citron"
+                        LargeImageKey = "redreamlogo",
+                        LargeImageText = "redream"
                     }
                 });
                 Console.WriteLine("Presence successfully set!");

@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Bheithir.Emulators;
 
 namespace Bheithir.Emulators
 {
@@ -37,7 +38,7 @@ namespace Bheithir.Emulators
             }
 
             try { SetNewPresence(); }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine($"Setting presence was not successful!\nERROR: {e.Message}");
                 return;
@@ -62,9 +63,9 @@ namespace Bheithir.Emulators
             {
                 process = Process.GetProcesses().Where(x => x.ProcessName.StartsWith(ProcessName)).ToList()[0];
             }
-            catch(Exception) { return; }
+            catch (Exception) { return; }
 
-            if(process.MainWindowTitle != WindowTitle)
+            if (process.MainWindowTitle != WindowTitle)
             {
                 Process = process;
                 WindowTitle = Process.MainWindowTitle;
@@ -72,40 +73,28 @@ namespace Bheithir.Emulators
             }
         }
 
-
-        public static string RemoveParenthesesAndBrackets(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return input;
-
-            // Pattern to match anything in () or []
-            string pattern = @"\s*[\(\[].*?[\)\]]";
-            return Regex.Replace(input, pattern, "").Trim();
-        }
-
-
         public override void SetNewPresence()
         {
             string[] titleParts = WindowPattern.Split(WindowTitle);
             string details;
             try
             {
-                if(titleParts.Length == 1)
+                if (titleParts.Length == 1)
                     details = "No game loaded";
                 else
-                    details = RemoveParenthesesAndBrackets(titleParts[0]);
+                    details = ParsingUtils.ParseTitle(ParsingUtils.RemoveParenthesesAndBrackets(titleParts[0]));
             }
-            catch(Exception) { return; }
+            catch (Exception) { return; }
 
             string status;
             try
             {
-                if(titleParts.Length == 1)
+                if (titleParts.Length == 1)
                     status = titleParts[0].Replace("Snes9x ", "v");
                 else
                     status = titleParts[2].Replace("Snes9x ", "v");
             }
-            catch(Exception) { return; }
+            catch (Exception) { return; }
 
             try
             {

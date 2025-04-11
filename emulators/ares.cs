@@ -8,6 +8,7 @@ namespace Bheithir.Emulators
 {
     class Ares : Presence
     {
+        private string oldtitle;
         public Ares()
         {
             DiscordAppId = "1360053620913078302";
@@ -21,7 +22,7 @@ namespace Bheithir.Emulators
 
             Process = Process.GetProcesses().Where(x => x.ProcessName.StartsWith(ProcessName)).ToList()[0];
             WindowTitle = Process.MainWindowTitle;
-
+            oldtitle = WindowTitle;
             Client.OnReady += (sender, e) => { };
             Client.OnPresenceUpdate += (sender, e) => { };
 
@@ -68,107 +69,26 @@ namespace Bheithir.Emulators
             {
                 Process = process;
                 WindowTitle = Process.MainWindowTitle;
-                SetNewPresence();
+                if (WindowTitle == ""){
+                    WindowTitle = WindowTitleHelper.GetWindowTitleFallback("ares");
+                }
+
+                if (!(WindowTitle == oldtitle)){
+                    oldtitle = WindowTitle;
+                    SetNewPresence();                    
+                }
             }
         }
-        public static string RemoveBeforeSecondPipe(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return input;
-
-            int firstPipe = input.IndexOf('|');
-            if (firstPipe == -1) return input;
-
-            int secondPipe = input.IndexOf('|', firstPipe + 1);
-            if (secondPipe == -1) return input;
-
-            int startIndex = secondPipe + 1;
-
-            // Skip the space directly after the second pipe if it exists
-            if (startIndex < input.Length && input[startIndex] == ' ')
-                startIndex++;
-
-            return input.Substring(startIndex);
-        }
-        public static bool HasTwoPipes(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return false;
-
-            int firstPipe = input.IndexOf('|');
-            if (firstPipe == -1) return false;
-
-            int secondPipe = input.IndexOf('|', firstPipe + 1);
-            return secondPipe != -1;
-        }
-
-        public static string RemoveAfter64Bit(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return input;
-
-            string marker = "(64-bit)";
-            int index = input.IndexOf(marker);
-            if (index == -1)
-                return input;
-
-            return input.Substring(0, index).TrimEnd();
-        }
-        public static string RemoveAfterSecondPipe(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return input;
-
-            int firstPipe = input.IndexOf('|');
-            if (firstPipe == -1) return input;
-
-            int secondPipe = input.IndexOf('|', firstPipe + 1);
-            if (secondPipe == -1) return input;
-
-            // Move back to remove the space before the second pipe, if it exists
-            int endIndex = secondPipe;
-            if (endIndex > 0 && input[endIndex - 1] == ' ')
-                endIndex--;
-
-            return input.Substring(0, endIndex).TrimEnd();
-        }
-        public static string RemoveParenthesesAndBrackets(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return input;
-
-            // Pattern to match anything in () or []
-            string pattern = @"\s*[\(\[].*?[\)\]]";
-            return Regex.Replace(input, pattern, "").Trim();
-        }
-        public static string RemoveBeforeDash(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return input;
-
-            int dashIndex = input.IndexOf('-');
-            if (dashIndex == -1)
-                return input;
-
-            int startIndex = dashIndex + 1;
-
-            // Skip the space after the dash, if it exists
-            if (startIndex < input.Length && input[startIndex] == ' ')
-                startIndex++;
-
-            return input.Substring(startIndex);
-        }
-
         public override void SetNewPresence()
         {
             string details;
-            Console.WriteLine(WindowTitle);
+            // Console.WriteLine(WindowTitle);
             try
             {
                 if (WindowTitle.Contains("ares"))
                     details = "No game loaded";
                 else
-                    details = RemoveBeforeDash(RemoveParenthesesAndBrackets(WindowTitle));
+                    details = ParsingUtils.ParseTitle(ParsingUtils.RemoveParenthesesAndBrackets(WindowTitle));
             }
             catch (Exception) { return; }
 

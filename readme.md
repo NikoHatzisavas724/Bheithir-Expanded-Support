@@ -8,6 +8,9 @@ Bheithir is a program that sets Discord Rich Presence (RPC) status for various e
 - [mGBA](https://mgba.io/)
 - [Mesen](https://www.mesen.ca/)
 - [Ares](https://ares-emu.net/)
+- [BSNES](https://bsnes.org/)
+- [PPSSPP](https://www.ppsspp.org/)
+- [redream](https://redream.io/)
 - [DOSBox](https://www.dosbox.com/)
     - [MS-DOS](https://en.wikipedia.org/wiki/MS-DOS) emulator primarilly designed for playing games
 - [DOSBox-X](https://dosbox-x.com/)
@@ -74,7 +77,7 @@ Bheithir is a program that sets Discord Rich Presence (RPC) status for various e
 ![CLI Execution](https://i.imgur.com/tct0D5Y.png "CLI Execution")
 
 ## Is it functional?
-At the moment it should be... Check the [issues](https://github.com/MechaDragonX/Bheithir/issues) tab for any issues.
+At the moment it should be... Check the [issues](https://github.com/NikoHatzisavas724/Bheithir-Expanded-Support/issues) tab for any issues.
 
 ## What the hell is this name?
 Since the first emulator I supported, DOSBox, is an emulator for MS-DOS, an American operating system, I decided to go with a name influenced by British mythology and folklore, as America shares a lot with Britian culturally. Bheithir is a dragon who was though to be a representation of the [Celtic goddess of storms, winter, death, and darkness](https://books.google.com/books?id=XPoRSLTkhtsC&pg=PA179&lpg=PA179&dq=bheithir+scotland&source=bl&ots=h2FaVFtlKN&sig=ACfU3U0fPo-tvlrPfv6CW9OVvdrHlOE66g&hl=en&ppis=_e&sa=X&ved=2ahUKEwjKiInks77oAhWuGTQIHZbbAToQ6AEwCXoECB4QAQ#v=onepage&q=bheithir%20scotland&f=false). It is said it once resided in the Scottish mountain, [Beinn a' Bheithir](https://en.wikipedia.org/wiki/Beinn_a%27_Bheithir), the Mountain of the Thunderbolt, where it was tricked and killed after terrorizing the villagers at the bottom of the mountain for a long time.

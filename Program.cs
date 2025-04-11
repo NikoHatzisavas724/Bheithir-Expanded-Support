@@ -20,7 +20,10 @@ namespace Bheithir
             { "mgba", new Mgba() },
             { "mesen", new Mesen() },
             { "ares", new Ares() },
-            { "citron", new Citron() }
+            { "citron", new Citron() },
+            { "bsnes", new Bsnes() },
+            { "ppsspp", new Ppsspp() },
+            { "redream", new Redream() }
         };
 
         private static void Main(string[] args)

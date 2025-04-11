@@ -6,12 +6,14 @@ using System.Text.RegularExpressions;
 
 namespace Bheithir.Emulators
 {
-    class Citron : Presence
+    class Bsnes : Presence
     {
-        public Citron()
+        private string oldtitle;
+
+        public Bsnes()
         {
-            DiscordAppId = "1360038366464311385";
-            ProcessName = "citron";
+            DiscordAppId = "1360152894023798794";
+            ProcessName = "bsnes";
             WindowPattern = new Regex("(\\s-\\s)(?!.*(\\s-\\s))", RegexOptions.Compiled);
         }
 
@@ -21,6 +23,7 @@ namespace Bheithir.Emulators
 
             Process = Process.GetProcesses().Where(x => x.ProcessName.StartsWith(ProcessName)).ToList()[0];
             WindowTitle = Process.MainWindowTitle;
+            oldtitle = WindowTitle;
 
             Client.OnReady += (sender, e) => { };
             Client.OnPresenceUpdate += (sender, e) => { };
@@ -68,41 +71,37 @@ namespace Bheithir.Emulators
             {
                 Process = process;
                 WindowTitle = Process.MainWindowTitle;
-                SetNewPresence();
+                if (WindowTitle == "")
+                {
+                    WindowTitle = WindowTitleHelper.GetWindowTitleFallback("bsnes");
+                }
+
+                if (!(WindowTitle == oldtitle))
+                {
+                    oldtitle = WindowTitle;
+                    SetNewPresence();
+                }
             }
-        }
-
-        public static bool HasTwoPipes(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return false;
-
-            int firstPipe = input.IndexOf('|');
-            if (firstPipe == -1) return false;
-
-            int secondPipe = input.IndexOf('|', firstPipe + 1);
-            return secondPipe != -1;
         }
 
         public override void SetNewPresence()
         {
-            string[] titleParts = WindowPattern.Split(WindowTitle);
             string details;
+            // Console.WriteLine(WindowTitle);
             try
             {
-                if (HasTwoPipes(titleParts[0]))
-                {
-                    details = ParsingUtils.RemoveAfter64Bit(ParsingUtils.RemoveBeforeSecondPipe(titleParts[0]));
-                }
-                else
+                if (WindowTitle.Contains("bsnes"))
                     details = "No game loaded";
+                else
+                    details = ParsingUtils.RemoveBeforeDash(ParsingUtils.RemoveParenthesesAndBrackets(WindowTitle));
             }
             catch (Exception) { return; }
 
             string status;
             try
             {
-                status = ParsingUtils.RemoveAfterSecondPipe(titleParts[0]);
+                // status = RemoveBeforeDash(RemoveParenthesesAndBrackets(WindowTitle));
+                status = "";
             }
             catch (Exception) { return; }
 
@@ -115,8 +114,8 @@ namespace Bheithir.Emulators
                     Timestamps = new Timestamps(DateTime.UtcNow),
                     Assets = new Assets()
                     {
-                        LargeImageKey = "citronlogo",
-                        LargeImageText = "Citron"
+                        LargeImageKey = "bsneslogo",
+                        LargeImageText = "BSNES"
                     }
                 });
                 Console.WriteLine("Presence successfully set!");
