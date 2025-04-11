@@ -19,6 +19,7 @@ namespace Bheithir
             { "mame", new Mame() },
             { "mgba", new Mgba() },
             { "mesen", new Mesen() },
+            { "ares", new Ares() },
             { "citron", new Citron() }
         };
 

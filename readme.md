@@ -7,6 +7,7 @@ Bheithir is a program that sets Discord Rich Presence (RPC) status for various e
 - [Citron](https://citron-emu.org/)
 - [mGBA](https://mgba.io/)
 - [Mesen](https://www.mesen.ca/)
+- [Ares](https://ares-emu.net/)
 - [DOSBox](https://www.dosbox.com/)
     - [MS-DOS](https://en.wikipedia.org/wiki/MS-DOS) emulator primarilly designed for playing games
 - [DOSBox-X](https://dosbox-x.com/)
