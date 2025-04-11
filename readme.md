@@ -25,12 +25,12 @@ Bheithir is a program that sets Discord Rich Presence (RPC) status for various e
     - [List of supported systems](https://emulation.gametechwiki.com/index.php/MAME_compatibility_list)
 
 ## What do I need to do/know before I run it?
-- You can get the latest binary from the [releases](https://github.com/MechaDragonX/Bheithir/releases) pages.
+- You can get the latest binary from the [releases](https://github.com/NikoHatzisavas724/Bheithir-Expanded-Support/releases) pages.
 - **All builds are framework-dependent!** Please follow the instructions for your OS to download .NET [here](https://dotnet.microsoft.com/download/dotnet/).
 - Bheithir runs on it's own and is entirely seperate from all emulators supported. **This is not a plugin!**
 - Bheithir works with all versions of these emulators after the first release where support was added.
     - Since this program is dependant on the text in the window title, it is possible earlier or future releases are not supported.
-    - If the presence does not look right, please leave an [issue](https://github.com/MechaDragonX/Bheithir/issues)!
+    - If the presence does not look right, please leave an [issue](https://github.com/NikoHatzisavas724/Bheithir-Expanded-Support/issues)!
 - The presence isn't showing up at all!!
     - Setting RPC status is only supported if you have the desktop app (Spotify RPC is an exception).
     - Open Discord and go to Settings (click the cog wheel next to your username, and the mute and deafen buttons).
