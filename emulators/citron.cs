@@ -6,12 +6,12 @@ using System.Text.RegularExpressions;
 
 namespace Bheithir.Emulators
 {
-    class Snes9x : Presence
+    class Citron : Presence
     {
-        public Snes9x()
+        public Citron()
         {
-            DiscordAppId = "1342995297550205089";
-            ProcessName = "snes9x";
+            DiscordAppId = "1360038366464311385";
+            ProcessName = "citron";
             WindowPattern = new Regex("(\\s-\\s)(?!.*(\\s-\\s))", RegexOptions.Compiled);
         }
 
@@ -37,7 +37,7 @@ namespace Bheithir.Emulators
             }
 
             try { SetNewPresence(); }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Console.WriteLine($"Setting presence was not successful!\nERROR: {e.Message}");
                 return;
@@ -62,27 +62,76 @@ namespace Bheithir.Emulators
             {
                 process = Process.GetProcesses().Where(x => x.ProcessName.StartsWith(ProcessName)).ToList()[0];
             }
-            catch(Exception) { return; }
+            catch (Exception) { return; }
 
-            if(process.MainWindowTitle != WindowTitle)
+            if (process.MainWindowTitle != WindowTitle)
             {
                 Process = process;
                 WindowTitle = Process.MainWindowTitle;
                 SetNewPresence();
             }
         }
-
-
-        public static string RemoveParenthesesAndBrackets(string input)
+        public static string RemoveBeforeSecondPipe(string input)
         {
             if (string.IsNullOrEmpty(input))
                 return input;
 
-            // Pattern to match anything in () or []
-            string pattern = @"\s*[\(\[].*?[\)\]]";
-            return Regex.Replace(input, pattern, "").Trim();
+            int firstPipe = input.IndexOf('|');
+            if (firstPipe == -1) return input;
+
+            int secondPipe = input.IndexOf('|', firstPipe + 1);
+            if (secondPipe == -1) return input;
+
+            int startIndex = secondPipe + 1;
+
+            // Skip the space directly after the second pipe if it exists
+            if (startIndex < input.Length && input[startIndex] == ' ')
+                startIndex++;
+
+            return input.Substring(startIndex);
+        }
+        public static bool HasTwoPipes(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return false;
+
+            int firstPipe = input.IndexOf('|');
+            if (firstPipe == -1) return false;
+
+            int secondPipe = input.IndexOf('|', firstPipe + 1);
+            return secondPipe != -1;
         }
 
+        public static string RemoveAfter64Bit(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            string marker = "(64-bit)";
+            int index = input.IndexOf(marker);
+            if (index == -1)
+                return input;
+
+            return input.Substring(0, index).TrimEnd();
+        }
+        public static string RemoveAfterSecondPipe(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return input;
+
+            int firstPipe = input.IndexOf('|');
+            if (firstPipe == -1) return input;
+
+            int secondPipe = input.IndexOf('|', firstPipe + 1);
+            if (secondPipe == -1) return input;
+
+            // Move back to remove the space before the second pipe, if it exists
+            int endIndex = secondPipe;
+            if (endIndex > 0 && input[endIndex - 1] == ' ')
+                endIndex--;
+
+            return input.Substring(0, endIndex).TrimEnd();
+        }
 
         public override void SetNewPresence()
         {
@@ -90,22 +139,21 @@ namespace Bheithir.Emulators
             string details;
             try
             {
-                if(titleParts.Length == 1)
-                    details = "No game loaded";
+                if (HasTwoPipes(titleParts[0]))
+                {
+                    details = RemoveAfter64Bit(RemoveBeforeSecondPipe(titleParts[0]));
+                }
                 else
-                    details = RemoveParenthesesAndBrackets(titleParts[0]);
+                    details = "No game loaded";
             }
-            catch(Exception) { return; }
+            catch (Exception) { return; }
 
             string status;
             try
             {
-                if(titleParts.Length == 1)
-                    status = titleParts[0].Replace("Snes9x ", "v");
-                else
-                    status = titleParts[2].Replace("Snes9x ", "v");
+                status = RemoveAfterSecondPipe(titleParts[0]);
             }
-            catch(Exception) { return; }
+            catch (Exception) { return; }
 
             try
             {
@@ -116,8 +164,8 @@ namespace Bheithir.Emulators
                     Timestamps = new Timestamps(DateTime.UtcNow),
                     Assets = new Assets()
                     {
-                        LargeImageKey = "snes",
-                        LargeImageText = "Snes9x"
+                        LargeImageKey = "citronlogo",
+                        LargeImageText = "Citron"
                     }
                 });
                 Console.WriteLine("Presence successfully set!");

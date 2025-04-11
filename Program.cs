@@ -16,7 +16,10 @@ namespace Bheithir
             { "snes9x", new Snes9x() },
             { "fusion", new Fusion() },
             { "vbam", new Vbam() },
-            { "mame", new Mame() }
+            { "mame", new Mame() },
+            { "mgba", new Mgba() },
+            { "mesen", new Mesen() },
+            { "citron", new Citron() }
         };
 
         private static void Main(string[] args)

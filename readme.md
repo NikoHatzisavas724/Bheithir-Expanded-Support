@@ -4,6 +4,9 @@
 Bheithir is a program that sets Discord Rich Presence (RPC) status for various emulators. 
 
 ## What emulators are supported right now?
+- [Citron](https://citron-emu.org/)
+- [mGBA](https://mgba.io/)
+- [Mesen](https://www.mesen.ca/)
 - [DOSBox](https://www.dosbox.com/)
     - [MS-DOS](https://en.wikipedia.org/wiki/MS-DOS) emulator primarilly designed for playing games
 - [DOSBox-X](https://dosbox-x.com/)
@@ -19,21 +22,6 @@ Bheithir is a program that sets Discord Rich Presence (RPC) status for various e
 - [MAME](https://www.mamedev.org/)
     - Emulates a variety of arcade systems and vintage computers
     - [List of supported systems](https://emulation.gametechwiki.com/index.php/MAME_compatibility_list)
-
-## What emulators will be supported in the future?
-- [PCSX2](https://pcsx2.net/)
-    - [PlayStation 2](https://en.wikipedia.org/wiki/PlayStation_2)
-- [DeSmuME](http://desmume.org/) and [melonDS](http://melonds.kuribo64.net/)
-    - [Nintendo DS](https://en.wikipedia.org/wiki/Nintendo_DS)
-- [ePSXe](https://www.epsxe.com/)
-    - [PlayStation 1](https://en.wikipedia.org/wiki/PlayStation_(console))
-- Other popular emulators for the consoles supported and consoles planned to be supported
-- [RetroArch](https://www.retroarch.com/)
-    - The most popular and widely supported multi-system emulator, as it has been ported to everything imaginable
-    - [List of supported systems](https://emulation.gametechwiki.com/index.php/Libretro#Cores)
-- [BizHawk](http://tasvideos.org/BizHawk.html)
-    - Multi-system, focused on TAS creation, supports [Libretro](https://docs.libretro.com/) cores (less accurately, but more popularly, referred to as [RetroArch](https://www.retroarch.com/) cores)
-    - [List of supported systems](https://emulation.gametechwiki.com/index.php/BizHawk#Supported_systems)
 
 ## What do I need to do/know before I run it?
 - You can get the latest binary from the [releases](https://github.com/MechaDragonX/Bheithir/releases) pages.
