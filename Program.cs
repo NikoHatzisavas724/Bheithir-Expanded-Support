@@ -88,7 +88,7 @@ class ProcessWatcher
         Application.SetCompatibleTextRenderingDefault(false);
 
         var assembly = Assembly.GetExecutingAssembly();
-        using (Stream stream = assembly.GetManifestResourceStream("Bheithir.bheithir.ico"))
+        using (Stream stream = assembly.GetManifestResourceStream("Bheithir.assets.bheithir.ico"))
         {
             Icon trayIconIcon = new Icon(stream);
             string appName = "Bheithir";
