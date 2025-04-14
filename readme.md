@@ -33,8 +33,8 @@ Bheithir is a program that sets Discord Rich Presence (RPC) status for various e
 - Open Bheithir either by double-clicking the executable.
 - Discord status will be set automatically.
 - Right click the system tray icon for the following options:
-    - Exit: closes the app
-    - Run at startup: will run the app at startup, completely automating all functions. This can be ticked on or off
+    - Exit: Closes the app
+    - Run at startup: Will run the app at startup, completely automating all functions. This can be ticked on or off
 
 ## What do I need to do/know before I run it?
 - You can get the latest binary from the [releases](https://github.com/NikoHatzisavas724/Bheithir-Expanded-Support/releases) pages.
