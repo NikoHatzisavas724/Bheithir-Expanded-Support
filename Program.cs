@@ -10,6 +10,33 @@ using System.Reflection;
 using System.IO;
 class ProcessWatcher
 {
+    private static bool IsStartupEnabled(string appName, string exePath)
+    {
+        using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+            @"Software\Microsoft\Windows\CurrentVersion\Run", false))
+        {
+            return key?.GetValue(appName)?.ToString() == exePath;
+        }
+    }
+
+    private static void EnableStartup(string appName, string exePath)
+    {
+        using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+            @"Software\Microsoft\Windows\CurrentVersion\Run", true))
+        {
+            key.SetValue(appName, exePath);
+        }
+    }
+
+    private static void DisableStartup(string appName)
+    {
+        using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
+            @"Software\Microsoft\Windows\CurrentVersion\Run", true))
+        {
+            key.DeleteValue(appName, false);
+        }
+    }
+
     private static readonly List<string> targetProcessNames = new List<string>
     {
         "citron",
@@ -58,6 +85,23 @@ class ProcessWatcher
         using (Stream stream = assembly.GetManifestResourceStream("Bheithir.bheithir.ico"))
         {
             Icon trayIconIcon = new Icon(stream);
+            string appName = "BheithirPresence";
+            string exePath = Process.GetCurrentProcess().MainModule.FileName;
+
+            bool isStartupEnabled = IsStartupEnabled(appName, exePath);
+
+            ToolStripMenuItem startupItem = new ToolStripMenuItem("Run at startup")
+            {
+                Checked = isStartupEnabled,
+                CheckOnClick = true
+            };
+            startupItem.CheckedChanged += (s, e) =>
+            {
+                if (startupItem.Checked)
+                    EnableStartup(appName, exePath);
+                else
+                    DisableStartup(appName);
+            };
 
             NotifyIcon trayIcon = new NotifyIcon()
             {
@@ -67,13 +111,12 @@ class ProcessWatcher
                 ContextMenuStrip = new ContextMenuStrip()
             };
 
+            trayIcon.ContextMenuStrip.Items.Add(startupItem);
             trayIcon.ContextMenuStrip.Items.Add(new ToolStripMenuItem("Exit", null, (s, e) =>
             {
                 trayIcon.Visible = false;
                 Application.Exit();
             }));
-
-
 
             System.Threading.Thread.Sleep(5000);
             Console.WriteLine("Watching for new processes...");
