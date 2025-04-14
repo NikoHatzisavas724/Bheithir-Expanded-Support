@@ -6,9 +6,10 @@ using Bheithir.Emulators;
 using System.Linq;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Reflection;
+using System.IO;
 class ProcessWatcher
 {
-    private static NotifyIcon trayIcon;
     private static readonly List<string> targetProcessNames = new List<string>
     {
         "citron",
@@ -53,36 +54,40 @@ class ProcessWatcher
         Application.EnableVisualStyles();
         Application.SetCompatibleTextRenderingDefault(false);
 
-        trayIcon = new NotifyIcon()
+        var assembly = Assembly.GetExecutingAssembly();
+        using (Stream stream = assembly.GetManifestResourceStream("Bheithir.bheithir.ico"))
         {
-            Icon = SystemIcons.Application,
-            Visible = true,
-            Text = "Bheithir",
-            ContextMenuStrip = new ContextMenuStrip()
+            Icon trayIconIcon = new Icon(stream);
+
+            NotifyIcon trayIcon = new NotifyIcon()
             {
-                Items = {
-                    new ToolStripMenuItem("Exit", null, (s, e) => {
-                        trayIcon.Visible = false;
-                        Application.Exit();
-                    })
-                }
-            }
-        };
+                Icon = trayIconIcon,
+                Visible = true,
+                Text = "Bheithir",
+                ContextMenuStrip = new ContextMenuStrip()
+            };
+
+            trayIcon.ContextMenuStrip.Items.Add(new ToolStripMenuItem("Exit", null, (s, e) =>
+            {
+                trayIcon.Visible = false;
+                Application.Exit();
+            }));
 
 
 
-        System.Threading.Thread.Sleep(5000);
-        Console.WriteLine("Watching for new processes...");
+            System.Threading.Thread.Sleep(5000);
+            Console.WriteLine("Watching for new processes...");
 
-        var startWatch = new ManagementEventWatcher(
-            new WqlEventQuery("SELECT * FROM Win32_ProcessStartTrace"));
+            var startWatch = new ManagementEventWatcher(
+                new WqlEventQuery("SELECT * FROM Win32_ProcessStartTrace"));
 
-        startWatch.EventArrived += new EventArrivedEventHandler(ProcessStarted);
-        startWatch.Start();
+            startWatch.EventArrived += new EventArrivedEventHandler(ProcessStarted);
+            startWatch.Start();
 
-        Application.Run();
+            Application.Run();
 
-        startWatch.Stop();
+            startWatch.Stop();
+        }
     }
 
     private static void ProcessStarted(object sender, EventArrivedEventArgs e)
@@ -100,8 +105,6 @@ class ProcessWatcher
             presence.Initialize();
             while (true)
             {
-                // Console.WriteLine("");
-                // Console.WriteLine(Process.GetProcesses().Any(x => x.ProcessName.StartsWith(presence.ProcessName)));
                 if (!Process.GetProcesses().Any(x => x.ProcessName.StartsWith(presence.ProcessName)))
                 {
                     presence.Deinitialize();
