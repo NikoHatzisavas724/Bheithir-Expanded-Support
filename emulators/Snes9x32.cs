@@ -3,16 +3,16 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Bheithir.Emulators;
 
 namespace Bheithir.Emulators
 {
-    class Citron : Presence
+    class Snes9x32 : Presence
     {
-        private string oldtitle;
-        public Citron()
+        public Snes9x32()
         {
-            DiscordAppId = "1360038366464311385";
-            ProcessName = "citron";
+            DiscordAppId = "1342995297550205089";
+            ProcessName = "snes9x";
             WindowPattern = new Regex("(\\s-\\s)(?!.*(\\s-\\s))", RegexOptions.Compiled);
         }
 
@@ -22,7 +22,7 @@ namespace Bheithir.Emulators
 
             Process = Process.GetProcesses().Where(x => x.ProcessName.StartsWith(ProcessName)).ToList()[0];
             WindowTitle = Process.MainWindowTitle;
-            oldtitle = WindowTitle;
+
             Client.OnReady += (sender, e) => { };
             Client.OnPresenceUpdate += (sender, e) => { };
 
@@ -69,48 +69,38 @@ namespace Bheithir.Emulators
             {
                 Process = process;
                 WindowTitle = Process.MainWindowTitle;
-                if (WindowTitle == ""){
-                    WindowTitle = WindowTitleHelper.GetWindowTitleFallback("ares");
-                }
-
-                if (!(WindowTitle == oldtitle)){
-                    oldtitle = WindowTitle;
-                    SetNewPresence();                    
-                }
+                SetNewPresence();
             }
-        }
-
-        public static bool HasTwoPipes(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return false;
-
-            int firstPipe = input.IndexOf('|');
-            if (firstPipe == -1) return false;
-
-            int secondPipe = input.IndexOf('|', firstPipe + 1);
-            return secondPipe != -1;
         }
 
         public override void SetNewPresence()
         {
-            string[] titleParts = WindowPattern.Split(WindowTitle);
+            string[] titleParts;
+            try
+            {
+                titleParts = WindowPattern.Split(WindowTitle);
+            }
+            catch (Exception)
+            {
+                return;
+            }
             string details;
             try
             {
-                if (HasTwoPipes(titleParts[0]))
-                {
-                    details = ParsingUtils.RemoveAfter64Bit(ParsingUtils.RemoveBeforeSecondPipe(titleParts[0]));
-                }
-                else
+                if (titleParts.Length == 1)
                     details = "No game loaded";
+                else
+                    details = ParsingUtils.ParseTitle(ParsingUtils.RemoveParenthesesAndBrackets(titleParts[0]));
             }
             catch (Exception) { return; }
 
             string status;
             try
             {
-                status = ParsingUtils.RemoveAfterSecondPipe(titleParts[0]);
+                if (titleParts.Length == 1)
+                    status = titleParts[0].Replace("Snes9x ", "v");
+                else
+                    status = titleParts[2].Replace("Snes9x ", "v");
             }
             catch (Exception) { return; }
 
@@ -123,8 +113,8 @@ namespace Bheithir.Emulators
                     Timestamps = new Timestamps(DateTime.UtcNow),
                     Assets = new Assets()
                     {
-                        LargeImageKey = "citronlogo",
-                        LargeImageText = "Citron"
+                        LargeImageKey = "snes",
+                        LargeImageText = "Snes9x"
                     }
                 });
                 Console.WriteLine("Presence successfully set!");

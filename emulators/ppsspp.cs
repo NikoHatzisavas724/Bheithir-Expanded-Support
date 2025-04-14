@@ -84,7 +84,15 @@ namespace Bheithir.Emulators
 
         public override void SetNewPresence()
         {
-            string[] titleParts = WindowPattern.Split(WindowTitle);
+            string[] titleParts;
+            try
+            {
+                titleParts = WindowPattern.Split(WindowTitle);
+            }
+            catch (Exception)
+            {
+                return;
+            }
             string details;
             try
             {

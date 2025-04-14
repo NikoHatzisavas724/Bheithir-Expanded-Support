@@ -12,7 +12,7 @@ namespace Bheithir.Emulators
         public Snes9x()
         {
             DiscordAppId = "1342995297550205089";
-            ProcessName = "snes9x";
+            ProcessName = "snes9x-x64";
             WindowPattern = new Regex("(\\s-\\s)(?!.*(\\s-\\s))", RegexOptions.Compiled);
         }
 
@@ -75,7 +75,15 @@ namespace Bheithir.Emulators
 
         public override void SetNewPresence()
         {
-            string[] titleParts = WindowPattern.Split(WindowTitle);
+            string[] titleParts;
+            try
+            {
+                titleParts = WindowPattern.Split(WindowTitle);
+            }
+            catch (Exception)
+            {
+                return;
+            }
             string details;
             try
             {

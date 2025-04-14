@@ -74,7 +74,15 @@ namespace Bheithir.Emulators
 
         public override void SetNewPresence()
         {
-            string titleParts = WindowTitle;
+            string titleParts;
+            try
+            {
+                titleParts = WindowTitle;
+            }
+            catch (Exception)
+            {
+                return;
+            }
             string details;
             try
             {

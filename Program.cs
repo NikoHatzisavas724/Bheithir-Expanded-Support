@@ -1,95 +1,99 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
+using System.Management;
 using Bheithir.Emulators;
+using System.Linq;
+using System.Drawing;
 
-namespace Bheithir
+class ProcessWatcher
 {
-    class Program
+    private static readonly List<string> targetProcessNames = new List<string>
     {
-        private static readonly Dictionary<string, Presence> emulators = new Dictionary<string, Presence>()
+        "citron",
+        "ares",
+        "bsnes",
+        "mGBA",
+        "dosbox-x",
+        "DOSBox",
+        "fcuex",
+        "Fusion",
+        "mame",
+        "Mesen",
+        "PPSSPPWindows64",
+        "redream",
+        "snes9x-x64",
+        "snes9x",        
+        "visualboyadvance-m",
+        "PPSSPPWindows",
+    };
+    private static readonly Dictionary<string, Presence> emulators = new Dictionary<string, Presence>()
+    {
+        { "DOSBox", new DosBox() },
+        { "dosbox-x", new DosBox_X() },
+        { "fceux", new Fceux() },
+        { "snes9x-x64", new Snes9x() },
+        { "snes9x", new Snes9x32() },
+        { "fusion", new Fusion() },
+        { "visualboyadvance-m", new Vbam() },
+        { "mame", new Mame() },
+        { "mGBA", new Mgba() },
+        { "Mesen", new Mesen() },
+        { "ares", new Ares() },
+        { "citron", new Citron() },
+        { "bsnes", new Bsnes() },
+        { "PPSSPPWindows64", new Ppsspp() },
+        { "PPSSPPWindows", new Ppsspp32()},
+        { "redream", new Redream() }
+    };
+    static void Main()
+    {
+        System.Threading.Thread.Sleep(5000);
+        Console.WriteLine("Watching for new processes...");
+
+        var startWatch = new ManagementEventWatcher(
+            new WqlEventQuery("SELECT * FROM Win32_ProcessStartTrace"));
+
+        startWatch.EventArrived += new EventArrivedEventHandler(ProcessStarted);
+        startWatch.Start();
+
+        Console.ReadLine();
+
+        startWatch.Stop();
+    }
+
+    private static void ProcessStarted(object sender, EventArrivedEventArgs e)
+    {
+        string processName = (string)e.NewEvent.Properties["ProcessName"].Value;
+
+        string cleanName = processName.Replace(".exe", "");
+        processName = cleanName;
+        if (targetProcessNames.Contains(processName))
         {
-            { "dosbox", new DosBox() },
-            { "dosbox-x", new DosBox_X() },
-            { "fceux", new Fceux() },
-            { "snes9x", new Snes9x() },
-            { "fusion", new Fusion() },
-            { "vbam", new Vbam() },
-            { "mame", new Mame() },
-            { "mgba", new Mgba() },
-            { "mesen", new Mesen() },
-            { "ares", new Ares() },
-            { "citron", new Citron() },
-            { "bsnes", new Bsnes() },
-            { "ppsspp", new Ppsspp() },
-            { "redream", new Redream() }
-        };
-
-        private static void Main(string[] args)
-        {
-            bool success = false;
-            string emulator = "";
-
-            if (args.Length > 0)
-            {
-                for (int i = 0; i < args.Length; i++)
-                {
-                    if (args[i].StartsWith("-"))
-                    {
-                        string flag = args[i].Substring(1).ToLower();
-                        if (emulators.ContainsKey(flag))
-                        {
-                            emulator = flag;
-                            success = true;
-                            break;
-                        }
-                        else
-                        {
-                            Console.WriteLine("The specified emulator is not supported!");
-                            return;
-                        }
-                    }
-                }
-            }
-
-            if (!success)
-            {
-                while (!success)
-                {
-                    Console.WriteLine("What emulator are you using?");
-                    Console.ForegroundColor = ConsoleColor.Cyan;
-                    emulator = Console.ReadLine().ToLower();
-                    Console.ResetColor();
-
-                    if (emulators.ContainsKey(emulator))
-                    {
-                        success = true;
-                    }
-                    else
-                    {
-                        Console.WriteLine("You misspelled the emulator name or that emulator is not supported!\n");
-                    }
-                }
-            }
-
+            Console.WriteLine($"Matched process started: {processName}");
+            string emulator = cleanName;
             Presence presence = emulators[emulator];
-
-            if (!Process.GetProcesses().Any(x => x.ProcessName.StartsWith(presence.ProcessName)))
-            {
-                Console.WriteLine("The specified emulator was not found! Is it open?");
-                return;
-            }
-
+            Console.WriteLine(presence.ProcessName);
             presence.Initialize();
             while (true)
             {
-                presence.Update();
+                // Console.WriteLine("");
+                // Console.WriteLine(Process.GetProcesses().Any(x => x.ProcessName.StartsWith(presence.ProcessName)));
                 if (!Process.GetProcesses().Any(x => x.ProcessName.StartsWith(presence.ProcessName)))
                 {
                     presence.Deinitialize();
                     Console.WriteLine("Thanks for using Bheithir!");
+
+                    string exePath = Process.GetCurrentProcess().MainModule.FileName;
+
+                    Process.Start(exePath);
+
+                    Environment.Exit(0);
                     return;
+                }
+                else
+                {
+                    presence.Update();
                 }
             }
         }

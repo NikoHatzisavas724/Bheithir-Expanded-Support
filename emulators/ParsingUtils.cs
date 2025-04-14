@@ -23,9 +23,19 @@ namespace Bheithir.Emulators
 
         public static string RemoveAfter64Bit(string input)
         {
-            string marker = "(64-bit)";
-            int index = input.IndexOf(marker);
-            return index == -1 ? input : input.Substring(0, index).TrimEnd();
+            // string marker = "(64-bit)";
+            // int index = input.IndexOf(marker);
+            // return index == -1 ? input : input.Substring(0, index).TrimEnd();
+            string[] markers = { "(64-bit)", "(32-bit)" };
+
+            foreach (var marker in markers)
+            {
+                int index = input.IndexOf(marker);
+                if (index != -1)
+                    return input.Substring(0, index).TrimEnd();
+            }
+
+            return input;
         }
         public static string RemoveFpsInParentheses(string input)
         {
