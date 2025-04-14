@@ -26,6 +26,15 @@ Bheithir is a program that sets Discord Rich Presence (RPC) status for various e
 - [MAME](https://www.mamedev.org/)
     - Emulates a variety of arcade systems and vintage computers
     - [List of supported systems](https://emulation.gametechwiki.com/index.php/MAME_compatibility_list)
+    
+## Instructions 
+- Open Discord and make sure you are signed in.
+- Open the emulator of your choice. You don't have to open a ROM/ISO yet.
+- Open Bheithir either by double-clicking the executable.
+- Discord status will be set automatically.
+- Right click the system tray icon for the following options:
+    - Exit: closes the app
+    - Run at startup: will run the app at startup, completely automating all functions. This can be ticked on or off
 
 ## What do I need to do/know before I run it?
 - You can get the latest binary from the [releases](https://github.com/NikoHatzisavas724/Bheithir-Expanded-Support/releases) pages.
@@ -67,14 +76,6 @@ Bheithir is a program that sets Discord Rich Presence (RPC) status for various e
     - x86_64 (64-bit)
         - 32-bit builds are no longer provided, but it may work with older 32-bit versions since the program looks for programs open that start with "mame", not "mame64".
     - v0.220
-
-## How do I run it?
-- Open Discord and make sure you are signed in.
-- Open the emulator of your choice. You don't have to open a ROM/ISO yet.
-- Open Bheithir either by double-clicking it in File Explorer or running it from the command line.
-- Follow the instructions in the program, and if nothing goes wrong, you're all set!
-- **You must open Bheithir after you open the emulator, as it checks to see if the emulator you selected is open. If not, the program will close!**
-![CLI Execution](https://i.imgur.com/tct0D5Y.png "CLI Execution")
 
 ## Upcoming Features
 - ~~A program icon~~ added
