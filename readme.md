@@ -77,8 +77,8 @@ Bheithir is a program that sets Discord Rich Presence (RPC) status for various e
 ![CLI Execution](https://i.imgur.com/tct0D5Y.png "CLI Execution")
 
 ## Upcoming Features
-- A program icon
-- Running as a system tray application so that it can update the background and you don't need to worry about it
+- ~~A program icon~~ added
+- ~~Running as a system tray application so that it can update the background and you don't need to worry about it~~ added
 
 ## Special Thanks
 Special thanks to [BloodDragooner](https://github.com/BloodDragooner) for giving me the idea to do this sort of thing with [SumatraPDF](https://github.com/sumatrapdfreader/sumatrapdf)! A lot of code was borrowed from that project, Chilong, so check it out [here](https://github.com/MechaDragonX/Chilong)!
