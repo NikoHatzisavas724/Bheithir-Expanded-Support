@@ -5,9 +5,10 @@ using System.Management;
 using Bheithir.Emulators;
 using System.Linq;
 using System.Drawing;
-
+using System.Windows.Forms;
 class ProcessWatcher
 {
+    private static NotifyIcon trayIcon;
     private static readonly List<string> targetProcessNames = new List<string>
     {
         "citron",
@@ -23,7 +24,7 @@ class ProcessWatcher
         "PPSSPPWindows64",
         "redream",
         "snes9x-x64",
-        "snes9x",        
+        "snes9x",
         "visualboyadvance-m",
         "PPSSPPWindows",
     };
@@ -46,8 +47,30 @@ class ProcessWatcher
         { "PPSSPPWindows", new Ppsspp32()},
         { "redream", new Redream() }
     };
+    [STAThread]
     static void Main()
     {
+        Application.EnableVisualStyles();
+        Application.SetCompatibleTextRenderingDefault(false);
+
+        trayIcon = new NotifyIcon()
+        {
+            Icon = SystemIcons.Application,
+            Visible = true,
+            Text = "Bheithir",
+            ContextMenuStrip = new ContextMenuStrip()
+            {
+                Items = {
+                    new ToolStripMenuItem("Exit", null, (s, e) => {
+                        trayIcon.Visible = false;
+                        Application.Exit();
+                    })
+                }
+            }
+        };
+
+
+
         System.Threading.Thread.Sleep(5000);
         Console.WriteLine("Watching for new processes...");
 
@@ -57,7 +80,7 @@ class ProcessWatcher
         startWatch.EventArrived += new EventArrivedEventHandler(ProcessStarted);
         startWatch.Start();
 
-        Console.ReadLine();
+        Application.Run();
 
         startWatch.Stop();
     }
