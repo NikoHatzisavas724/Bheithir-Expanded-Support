@@ -1,15 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Management;
-using Bheithir.Emulators;
 using System.Linq;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Reflection;
 using System.IO;
+using System.Timers;
+using Bheithir.Emulators;
+
 class ProcessWatcher
 {
+    private static HashSet<string> seenProcesses = new HashSet<string>();
+    private static System.Timers.Timer pollTimer;
+
     private static bool IsStartupEnabled(string appName, string exePath)
     {
         using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
@@ -33,29 +37,30 @@ class ProcessWatcher
         using (var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(
             @"Software\Microsoft\Windows\CurrentVersion\Run", true))
         {
-            key.DeleteValue(appName, false);
+            if (key != null)
+            {
+                var valueNames = key.GetValueNames();
+                foreach (var valueName in valueNames)
+                {
+                    if (valueName.IndexOf(appName, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        key.DeleteValue(valueName, false);
+                        Console.WriteLine($"Removed startup entry: {valueName}");
+                    }
+                }
+            }
         }
     }
 
+
+
     private static readonly List<string> targetProcessNames = new List<string>
     {
-        "citron",
-        "ares",
-        "bsnes",
-        "mGBA",
-        "dosbox-x",
-        "DOSBox",
-        "fcuex",
-        "Fusion",
-        "mame",
-        "Mesen",
-        "PPSSPPWindows64",
-        "redream",
-        "snes9x-x64",
-        "snes9x",
-        "visualboyadvance-m",
-        "PPSSPPWindows",
+        "citron", "ares", "bsnes", "mGBA", "dosbox-x", "DOSBox", "fcuex", "Fusion",
+        "mame", "Mesen", "PPSSPPWindows64", "redream", "snes9x-x64", "snes9x",
+        "visualboyadvance-m", "PPSSPPWindows"
     };
+
     private static readonly Dictionary<string, Presence> emulators = new Dictionary<string, Presence>()
     {
         { "DOSBox", new DosBox() },
@@ -72,9 +77,10 @@ class ProcessWatcher
         { "citron", new Citron() },
         { "bsnes", new Bsnes() },
         { "PPSSPPWindows64", new Ppsspp() },
-        { "PPSSPPWindows", new Ppsspp32()},
+        { "PPSSPPWindows", new Ppsspp32() },
         { "redream", new Redream() }
     };
+
     [STAThread]
     static void Main()
     {
@@ -85,7 +91,7 @@ class ProcessWatcher
         using (Stream stream = assembly.GetManifestResourceStream("Bheithir.bheithir.ico"))
         {
             Icon trayIconIcon = new Icon(stream);
-            string appName = "BheithirPresence";
+            string appName = "Bheithir";
             string exePath = Process.GetCurrentProcess().MainModule.FileName;
 
             bool isStartupEnabled = IsStartupEnabled(appName, exePath);
@@ -118,53 +124,77 @@ class ProcessWatcher
                 Application.Exit();
             }));
 
-            System.Threading.Thread.Sleep(5000);
-            Console.WriteLine("Watching for new processes...");
+            CheckRunningProcessesOnStartup();
 
-            var startWatch = new ManagementEventWatcher(
-                new WqlEventQuery("SELECT * FROM Win32_ProcessStartTrace"));
-
-            startWatch.EventArrived += new EventArrivedEventHandler(ProcessStarted);
-            startWatch.Start();
-
+            Console.WriteLine("Polling for new processes...");
+            StartPolling();
             Application.Run();
-
-            startWatch.Stop();
         }
     }
 
-    private static void ProcessStarted(object sender, EventArrivedEventArgs e)
+    private static void StartPolling()
     {
-        string processName = (string)e.NewEvent.Properties["ProcessName"].Value;
+        pollTimer = new System.Timers.Timer(3000);
+        pollTimer.Elapsed += PollProcesses;
+        pollTimer.AutoReset = true;
+        pollTimer.Start();
+    }
 
-        string cleanName = processName.Replace(".exe", "");
-        processName = cleanName;
-        if (targetProcessNames.Contains(processName))
+    private static void PollProcesses(object sender, ElapsedEventArgs e)
+    {
+        var currentProcesses = Process.GetProcesses().Select(p => p.ProcessName).ToHashSet();
+
+        foreach (var procName in currentProcesses)
         {
-            Console.WriteLine($"Matched process started: {processName}");
-            string emulator = cleanName;
-            Presence presence = emulators[emulator];
-            Console.WriteLine(presence.ProcessName);
-            presence.Initialize();
-            while (true)
+            if (targetProcessNames.Contains(procName) && !seenProcesses.Contains(procName))
             {
-                if (!Process.GetProcesses().Any(x => x.ProcessName.StartsWith(presence.ProcessName)))
+                seenProcesses.Add(procName);
+                Console.WriteLine($"Matched process started: {procName}");
+                HandleEmulatorStart(procName);
+            }
+        }
+
+        seenProcesses.RemoveWhere(p => !currentProcesses.Contains(p));
+    }
+
+    private static void HandleEmulatorStart(string processName)
+    {
+        if (emulators.TryGetValue(processName, out Presence presence))
+        {
+            presence.Initialize();
+            new System.Threading.Thread(() =>
+            {
+                while (true)
                 {
-                    presence.Deinitialize();
-                    Console.WriteLine("Thanks for using Bheithir!");
-
-                    string exePath = Process.GetCurrentProcess().MainModule.FileName;
-
-                    Process.Start(exePath);
-
-                    Environment.Exit(0);
-                    return;
+                    if (!Process.GetProcesses().Any(p => p.ProcessName.StartsWith(presence.ProcessName)))
+                    {
+                        presence.Deinitialize();
+                        Console.WriteLine("Thanks for using Bheithir!");
+                        break;
+                    }
+                    else
+                    {
+                        presence.Update();
+                        System.Threading.Thread.Sleep(1000);
+                    }
                 }
-                else
-                {
-                    presence.Update();
-                }
+            })
+            { IsBackground = true }.Start();
+        }
+    }
+    private static void CheckRunningProcessesOnStartup()
+    {
+        var currentProcesses = Process.GetProcesses().Select(p => p.ProcessName).ToHashSet();
+
+        foreach (var procName in currentProcesses)
+        {
+            if (targetProcessNames.Contains(procName) && !seenProcesses.Contains(procName))
+            {
+                seenProcesses.Add(procName);
+                Console.WriteLine($"Matched process already running at startup: {procName}");
+                HandleEmulatorStart(procName);
             }
         }
     }
+
 }
