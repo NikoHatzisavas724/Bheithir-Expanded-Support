@@ -342,3 +342,5 @@ healthchecksdb
 Bheithir-1.0.zip
 
 *.zip
+
+*.sh
