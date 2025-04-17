@@ -29,7 +29,7 @@ Bheithir is a program that sets Discord Rich Presence (RPC) status for various e
     
 ## Instructions 
 - Open Discord and make sure you are signed in.
-- Open the emulator of your choice. You don't have to open a ROM/ISO yet.
+- Open the emulator of your choice. You don't have to open a ROM/ISO yet. It doesn't matter if the emulator is opened before or after Bheithir.
 - Open Bheithir either by double-clicking the executable.
 - Discord status will be set automatically.
 - Right click the system tray icon for the following options:
